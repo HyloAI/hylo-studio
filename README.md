@@ -15,3 +15,5 @@ uv run wc playground --repo ../bench \
 
 `--repo` is the working directory the UI shows (`examples/configs`, `examples/evolve`, `runs/`) and runs jobs in.
 Pages and options: [web/README.md](web/README.md).
+
+Documentation (worldcurrent-docs, `uv run mkdocs serve -f docs/mkdocs.yml` from the workspace): [studio](../docs/docs/user-guide/studio.md).
