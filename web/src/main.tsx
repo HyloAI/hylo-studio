@@ -36,7 +36,7 @@ function Rail() {
   const cal = o?.judge?.calibration;
   return (
     <nav className="rail">
-      <div className="brand"><Icon.mark /><div><b>worldcurrent</b><small>workcell console</small></div></div>
+      <div className="brand"><Icon.mark /><div><b>Hylo</b><small>workcell console</small></div></div>
       <div className="nav">
         {NAV.map(([to, label, I]) => <NavLink key={to} to={to} end={to === "/"}><I />{label}</NavLink>)}
       </div>

@@ -10,7 +10,7 @@ type Msg = Record<string, any>;
 
 function wsUrl(path: string): string {
   const proto = window.location.protocol === "https:" ? "wss" : "ws";
-  const token = new URLSearchParams(window.location.search).get("token") || localStorage.getItem("wc-token") || "";
+  const token = new URLSearchParams(window.location.search).get("token") || localStorage.getItem("hylo-token") || "";
   return `${proto}://${window.location.host}${path}${token ? `?token=${encodeURIComponent(token)}` : ""}`;
 }
 

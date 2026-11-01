@@ -23,7 +23,7 @@ function Skills() {
   const [libs, err] = useApi<any[]>("/api/skills");
   if (err) return <Err e={err} />;
   if (!libs) return <Loading />;
-  if (!libs.length) return <div className="empty-state">No skill library yet. Build one from a campaign with <code>wc skills CAMPAIGN --out runs/skills/NAME</code>.</div>;
+  if (!libs.length) return <div className="empty-state">No skill library yet. Build one from a campaign with <code>hylo skills CAMPAIGN --out runs/skills/NAME</code>.</div>;
   return <div className="stack">{libs.map((lib) => {
     const order = { verified: 0, proposed: 1, refuted: 2, deprecated: 3 } as Record<string, number>;
     const skills = [...lib.skills].sort((a, b) => (order[a.status] - order[b.status]) || ((b.evidence?.effect ?? -1) - (a.evidence?.effect ?? -1)));
@@ -123,7 +123,7 @@ function Artifacts() {
   const [open, setOpen] = useState<string | null>(null);
   if (err) return <Err e={err} />;
   if (!arts) return <Loading />;
-  if (!arts.length) return <div className="empty-state">No sealed artifact yet. Train one with <code>wc learn JOB.json</code>.</div>;
+  if (!arts.length) return <div className="empty-state">No sealed artifact yet. Train one with <code>hylo learn JOB.json</code>.</div>;
   return (
     <Panel flush>
       <div className="scroll-x">

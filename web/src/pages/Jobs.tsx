@@ -1,4 +1,4 @@
-// Background jobs: the regular wc commands, started from the browser, with their logs.
+// Background jobs: the regular hylo commands, started from the browser, with their logs.
 import { useEffect, useState } from "react";
 import { ago, get, post, useApi } from "../api";
 import { Icon } from "../components/icons";
@@ -74,7 +74,7 @@ export function Jobs() {
             {jobs && !jobs.length && <div className="empty-state">No jobs yet.</div>}
           </Panel>
         </div>
-        <Panel title={cur ? `wc ${cur.cmd.join(" ")}`.slice(0, 110) : "Log"} right={cur?.status === "running" && <button className="btn stop" onClick={() => post(`/api/jobs/${sel}/stop`).then(reload)}><Icon.stop />Stop</button>}>
+        <Panel title={cur ? `hylo ${cur.cmd.join(" ")}`.slice(0, 110) : "Log"} right={cur?.status === "running" && <button className="btn stop" onClick={() => post(`/api/jobs/${sel}/stop`).then(reload)}><Icon.stop />Stop</button>}>
           <pre className="terminal" style={{ minHeight: 420 }}>{sel ? log || "waiting for output…" : "Select a job to follow its output."}</pre>
         </Panel>
       </div>

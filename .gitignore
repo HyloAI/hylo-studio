@@ -5,4 +5,4 @@ __pycache__/
 runs/
 MUJOCO_LOG.TXT
 web/node_modules/
-packages/wc-playground/src/worldcurrent/playground/static/
+packages/hylo-playground/src/hylo/playground/static/

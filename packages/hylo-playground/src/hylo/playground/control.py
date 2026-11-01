@@ -19,7 +19,7 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any
 
-from worldcurrent.core.remote.workcell import PATHS, OperatorEvent, StartEpisode
+from hylo.core.remote.workcell import PATHS, OperatorEvent, StartEpisode
 
 ROLES = ("viewer", "operator", "approver")
 
@@ -98,7 +98,7 @@ class ControlPlane:
         out = []
         for p in self.policies.values():
             http = p.url.replace("ws://", "http://").replace("wss://", "https://")
-            base = http.rsplit("/", 1)[0] if http.endswith(("/wc", "/openpi")) else http
+            base = http.rsplit("/", 1)[0] if http.endswith(("/hylo", "/wc", "/openpi")) else http
             try:
                 meta = self._http(Endpoint(p.name, base, p.token), "/meta")
                 out.append({"name": p.name, "url": p.url, "reachable": True, "agent": meta.get("agent", {}).get("name"),
@@ -111,8 +111,8 @@ class ControlPlane:
         body = dict(body)
         if isinstance(body.get("policy"), str):                     # a policy chosen by name
             p = self.policies[body["policy"]]
-            body["policy"] = {"url": p.url, "token": p.token, "protocol": "openpi" if p.url.endswith("/openpi") else "wc"}
-        req = StartEpisode.model_validate(body)                     # wc.workcell/v0.1 (core.remote.workcell)
+            body["policy"] = {"url": p.url, "token": p.token, "protocol": "openpi" if p.url.endswith("/openpi") else "hylo"}
+        req = StartEpisode.model_validate(body)                     # hylo.workcell/v0.1 (core.remote.workcell)
         return self._http(self.workcell(name), PATHS["episodes"], req.model_dump(mode="json", exclude_none=True))
 
     def operator(self, name: str, event: dict[str, Any]) -> Any:

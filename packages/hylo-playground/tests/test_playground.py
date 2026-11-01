@@ -7,11 +7,11 @@ pytest.importorskip("httpx")
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from worldcurrent.eval.experiment import run_experiment  # noqa: E402
-from worldcurrent.core.config import ExperimentConfig  # noqa: E402
-from worldcurrent.playground.app import create_app  # noqa: E402
+from hylo.eval.experiment import run_experiment  # noqa: E402
+from hylo.core.config import ExperimentConfig  # noqa: E402
+from hylo.playground.app import create_app  # noqa: E402
 
-CFG = """schema_version: wc.experiment/v0.1
+CFG = """schema_version: hylo.experiment/v0.1
 name: double-play
 benchmark: {type: testing/reach-v0, split: validation, params: {tags: [reach]}}
 env: {type: testing.point_reach}
@@ -80,7 +80,7 @@ def test_token_is_required_when_configured(repo):
 
 
 def test_approval_and_rollback_go_through_the_wc_command(repo, monkeypatch):
-    from worldcurrent.evolve.campaign import EvolveConfig, run_campaign
+    from hylo.evolve.campaign import EvolveConfig, run_campaign
 
     monkeypatch.chdir(repo)
     cfg = EvolveConfig(name="pg", experiment="examples/configs/double.yaml", approval="manual", cycles=1,

@@ -1,10 +1,10 @@
-"""worldcurrent playground: a local web UI over the existing system (FastAPI backend + React frontend).
+"""Hylo playground: a local web UI over the existing system (FastAPI backend + React frontend).
 
-    wc-playground --root runs --port 8765            # then open http://127.0.0.1:8765
+    hylo-playground --root runs --port 8765            # then open http://127.0.0.1:8765
 
-Read-only pages go through the catalog API (worldcurrent.catalog), never through other packages' internals.
+Read-only pages go through the catalog API (hylo.catalog), never through other packages' internals.
 Actions go through public paths only: live episodes through the kernel and SafetyShield, components through the
-plugin registry, jobs and approval / rollback through the `wc` command. Protected settings (safety, benchmark, trace, scoring)
+plugin registry, jobs and approval / rollback through the `hylo` command. Protected settings (safety, benchmark, trace, scoring)
 cannot be overridden from the UI. Binds to 127.0.0.1 by default; with --token every API call needs it.
 
 It is also the control plane for workcells and policy servers (control.py): `--workcell name=url`,
@@ -22,10 +22,10 @@ from fastapi import Body, FastAPI, HTTPException, Query, Request, WebSocket, Web
 from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import ValidationError
 
-from worldcurrent.catalog.episodes import TraceCache, frame_array, timeline
-from worldcurrent.catalog.index import Catalog
-from worldcurrent.core.registry import registry
-from worldcurrent.core.store import Store, StoreError, is_ref
+from hylo.catalog.episodes import TraceCache, frame_array, timeline
+from hylo.catalog.index import Catalog
+from hylo.core.registry import registry
+from hylo.core.store import Store, StoreError, is_ref
 
 from .control import ControlPlane, Endpoint, Roles
 from .jobs import JobManager, run_cli
@@ -44,7 +44,7 @@ def create_app(root: str | Path = "runs", *, repo: str | Path = ".", token: str 
                role_tokens: dict[str, str] | None = None) -> FastAPI:
     repo = Path(repo).resolve()
     root = (repo / root).resolve() if not Path(root).is_absolute() else Path(root)
-    app = FastAPI(title="worldcurrent playground", docs_url="/api/docs", openapi_url="/api/openapi.json")
+    app = FastAPI(title="Hylo playground", docs_url="/api/docs", openapi_url="/api/openapi.json")
     index, traces = Catalog(root), TraceCache()
     live, jobs = LiveManager(root), JobManager(root, repo)
     def artifact_path(ref: str) -> str | None:
@@ -361,7 +361,7 @@ def main(argv: list[str] | None = None) -> int:
 
     import uvicorn
 
-    ap = argparse.ArgumentParser(prog="wc-playground")
+    ap = argparse.ArgumentParser(prog="hylo-playground")
     ap.add_argument("--root", default="runs", help="runs directory (relative to --repo)")
     ap.add_argument("--repo", default=".", help="repository root (for examples/ and job working directory)")
     ap.add_argument("--host", default="127.0.0.1")
@@ -379,7 +379,7 @@ def main(argv: list[str] | None = None) -> int:
         ap.error(f"unknown roles {sorted(bad)}")
     app = create_app(a.root, repo=a.repo, token=a.token, judge=a.judge, workcells=[Endpoint.parse(w) for w in a.workcell],
                      policies=[Endpoint.parse(p) for p in a.policy], role_tokens=role_tokens)
-    print(f"worldcurrent playground on http://{a.host}:{a.port}")
+    print(f"Hylo playground on http://{a.host}:{a.port}")
     uvicorn.run(app, host=a.host, port=a.port, log_level="warning")
     app.state.live.close()
     return 0

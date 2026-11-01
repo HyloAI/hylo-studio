@@ -22,15 +22,15 @@ from typing import Any, Callable
 
 import numpy as np
 
-from worldcurrent.eval.experiment import build_agent, env_factory
-from worldcurrent.core.config import ExperimentConfig, build_manifest
-from worldcurrent.core.events import Event, EventBus
-from worldcurrent.core.kernel import EpisodeRunner
-from worldcurrent.core.registry import registry
-from worldcurrent.core.trace import TraceStore
-from worldcurrent.core.types import Observation
+from hylo.eval.experiment import build_agent, env_factory
+from hylo.core.config import ExperimentConfig, build_manifest
+from hylo.core.events import Event, EventBus
+from hylo.core.kernel import EpisodeRunner
+from hylo.core.registry import registry
+from hylo.core.trace import TraceStore
+from hylo.core.types import Observation
 
-from worldcurrent.catalog.episodes import to_json as _f
+from hylo.catalog.episodes import to_json as _f
 
 from .render import jpeg
 

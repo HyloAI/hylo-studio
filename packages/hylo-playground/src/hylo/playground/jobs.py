@@ -1,4 +1,4 @@
-"""Background jobs: the playground launches the same CLI commands a user would type (wc run / evolve / learn /
+"""Background jobs: the playground launches the same CLI commands a user would type (hylo run / evolve / learn /
 calibrate) as subprocesses, with their output in runs/playground/jobs/<id>.log. Nothing bypasses the CLI's checks."""
 
 from __future__ import annotations
@@ -26,8 +26,8 @@ KINDS = {
 
 
 def run_cli(args: list[str], *, cwd: str | Path, timeout: float = 300) -> str:
-    """Run one `wc` command synchronously and return its last output line; raise with its output on failure."""
-    res = subprocess.run([sys.executable, "-m", "worldcurrent.core.cli", *args], cwd=cwd, capture_output=True, text=True,
+    """Run one `hylo` command synchronously and return its last output line; raise with its output on failure."""
+    res = subprocess.run([sys.executable, "-m", "hylo.core.cli", *args], cwd=cwd, capture_output=True, text=True,
                          timeout=timeout)
     if res.returncode != 0:
         raise RuntimeError((res.stderr or res.stdout).strip()[-800:])
@@ -47,7 +47,7 @@ class JobManager:
         if kind not in KINDS:
             raise ValueError(f"unknown job kind {kind!r}; known: {sorted(KINDS)}")
         jid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:4]
-        cmd = [sys.executable, "-m", "worldcurrent.core.cli", *KINDS[kind](args)]
+        cmd = [sys.executable, "-m", "hylo.core.cli", *KINDS[kind](args)]
         log = open(self.dir / f"{jid}.log", "w")
         proc = subprocess.Popen(cmd, cwd=self.cwd, stdout=log, stderr=subprocess.STDOUT)
         meta = {"id": jid, "kind": kind, "args": args, "cmd": cmd[2:], "started": time.time(), "pid": proc.pid}

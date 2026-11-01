@@ -1,8 +1,8 @@
-// Thin client for the wc-playground backend (studio/packages/wc-playground). Responses are plain JSON from the runs directory.
+// Thin client for the hylo-playground backend (studio/packages/hylo-playground). Responses are plain JSON from the runs directory.
 import { useEffect, useState } from "react";
 
-const token = new URLSearchParams(window.location.search).get("token") || localStorage.getItem("wc-token") || "";
-if (token) localStorage.setItem("wc-token", token);
+const token = new URLSearchParams(window.location.search).get("token") || localStorage.getItem("hylo-token") || "";
+if (token) localStorage.setItem("hylo-token", token);
 
 function withToken(path: string): string {
   if (!token) return path;

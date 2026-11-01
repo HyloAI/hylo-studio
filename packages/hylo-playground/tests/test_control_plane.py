@@ -1,5 +1,5 @@
-"""The control plane against workcells. A fake workcell speaking wc.workcell/v0.1 (core.remote.workcell) keeps
-these tests independent of worldcurrent-serve; with serve installed (a development workspace), the episode test
+"""The control plane against workcells. A fake workcell speaking hylo.workcell/v0.1 (core.remote.workcell) keeps
+these tests independent of hylo-serve; with serve installed (a development workspace), the episode test
 also runs against a real workcell and policy server."""
 
 import socket
@@ -12,9 +12,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from worldcurrent.core.remote.workcell import OperatorAck, OperatorEvent
-from worldcurrent.playground.app import create_app
-from worldcurrent.playground.control import Endpoint
+from hylo.core.remote.workcell import OperatorAck, OperatorEvent
+from hylo.playground.app import create_app
+from hylo.playground.control import Endpoint
 
 
 def _free_port():
@@ -63,10 +63,10 @@ def fake(tmp_path):
 
 @pytest.fixture
 def stack(tmp_path):
-    pytest.importorskip("worldcurrent.serve", reason="the real workcell is in worldcurrent-serve")
-    from worldcurrent.serve.policy import PolicyServer
-    from worldcurrent.serve.workcell import WorkcellConfig
-    from worldcurrent.serve.workcell import create_app as workcell_app
+    pytest.importorskip("hylo.serve", reason="the real workcell is in hylo-serve")
+    from hylo.serve.policy import PolicyServer
+    from hylo.serve.workcell import WorkcellConfig
+    from hylo.serve.workcell import create_app as workcell_app
 
     policy = PolicyServer(agent={"type": "testing.p_controller", "params": {"kp": 2.0, "horizon": 5, "execution_steps": 5}},
                           port=0, log=lambda m: None).start()
