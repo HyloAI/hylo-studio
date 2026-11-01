@@ -1,0 +1,25 @@
+[project]
+name = "wc-playground"
+version = "0.1.0.dev0"
+description = "worldcurrent playground: a local web UI to explore runs, replay episodes, run live episodes, compare agents and inspect improvement campaigns"
+requires-python = ">=3.10"
+dependencies = ["wc-core", "wc-eval", "wc-catalog", "fastapi>=0.110", "uvicorn>=0.29", "pillow>=10"]
+license = "Apache-2.0"
+
+[project.scripts]
+wc-playground = "worldcurrent.playground.app:main"
+
+[project.entry-points."worldcurrent.commands"]
+playground = "worldcurrent.playground.app:main"
+
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/worldcurrent"]
+
+[tool.uv.sources]
+wc-core = { workspace = true }
+wc-eval = { workspace = true }
+wc-catalog = { workspace = true }
