@@ -17,3 +17,7 @@ uv run hylo playground --repo ../bench \
 Pages and options: [web/README.md](web/README.md).
 
 Documentation (hylo-docs, `uv run mkdocs serve -f docs/mkdocs.yml` from the workspace): [studio](../docs/docs/user-guide/studio.md).
+
+## License
+
+Apache License 2.0 (see [LICENSE](LICENSE)). Copyright 2026 Hylo AI.
