@@ -29,7 +29,7 @@ FastAPI backend and control plane (`hylo playground`); `web/` is the React front
 <p align="center">
   <img src=".github/assets/studio-episode.png" width="100%" alt="Studio replaying a LIBERO-10 episode: agent view and wrist camera, translation, rotation and gripper traces, the episode's agent, policy, steering and critic, and the event log">
 </p>
-<p align="center"><sub>Replaying one LIBERO-10 episode: both cameras, the action traces, what ran and every policy call.</sub></p>
+<p align="center">Replaying one LIBERO-10 episode: both cameras, the action traces and every policy call.</p>
 
 The control plane never sends actions. It starts episodes on workcells (the workcell API, hylo.workcell/v0.1),
 relays operator input with roles (viewer < operator < approver; the e-stop is open to every role) and runs `hylo`
@@ -48,8 +48,8 @@ commands as jobs. It reads runs and campaigns through the harness's catalog.
     <td width="50%"><img src=".github/assets/studio-runs.png" alt="Runs and replays: every run by split, agent, episodes, success and safety"></td>
   </tr>
   <tr>
-    <td align="center"><sub>A campaign: each candidate's hypothesis, its path through the cascade and the gate's verdict.</sub></td>
-    <td align="center"><sub>Runs and replays, filtered by split: success and safety per run.</sub></td>
+    <td align="center">A campaign and the gate's verdicts</td>
+    <td align="center">Runs and replays</td>
   </tr>
 </table>
 
