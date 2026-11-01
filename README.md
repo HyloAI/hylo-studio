@@ -1,5 +1,8 @@
 # hylo-studio
 
+Part of [Hylo](https://hyloai.github.io/), the stack for physical AI. This repository is **Hylo Studio**, the
+**workbench** layer.
+
 The playground: one web UI over runs, campaigns, learning artifacts and workcells. `packages/hylo-playground` is the
 FastAPI backend and control plane (`hylo playground`); `web/` is the React front end, built into the package.
 
