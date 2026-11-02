@@ -16,13 +16,15 @@ import { Jobs } from "./pages/Jobs";
 import { Live } from "./pages/Live";
 import { Operator } from "./pages/Operator";
 import { Overview } from "./pages/Overview";
+import { Research, ResearchSession } from "./pages/Research";
 import { Episode, RunDetail, Runs } from "./pages/Runs";
+import { WorldStage, Worlds } from "./pages/World";
 import "./styles.css";
 
 const NAV: [string, string, () => JSX.Element][] = [
   ["/", "Console", Icon.console], ["/live", "Live sandbox", Icon.live], ["/operator", "Operator station", Icon.station], ["/runs", "Runs & replays", Icon.runs],
-  ["/compare", "A/B arena", Icon.compare], ["/campaigns", "Self-improvement", Icon.loop], ["/experience", "Experience", Icon.learn],
-  ["/jobs", "Jobs", Icon.jobs],
+  ["/compare", "A/B arena", Icon.compare], ["/campaigns", "Self-improvement", Icon.loop], ["/research", "Research", Icon.research], ["/experience", "Experience", Icon.learn],
+  ["/jobs", "Jobs", Icon.jobs], ["/world", "World", Icon.world],
 ];
 
 function Rail() {
@@ -67,8 +69,12 @@ function App() {
           <Route path="/compare" element={<Compare />} />
           <Route path="/campaigns" element={<Campaigns />} />
           <Route path="/campaigns/:id" element={<CampaignDetail />} />
+          <Route path="/research" element={<Research />} />
+          <Route path="/research/:id" element={<ResearchSession />} />
           <Route path="/experience" element={<Experience />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/world" element={<Worlds />} />
+          <Route path="/world/:stage" element={<WorldStage />} />
           <Route path="*" element={<div className="empty-state">This page does not exist.</div>} />
         </Routes>
       </main>

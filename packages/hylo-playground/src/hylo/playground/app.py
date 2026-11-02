@@ -7,6 +7,9 @@ Actions go through public paths only: live episodes through the kernel and Safet
 plugin registry, jobs and approval / rollback through the `hylo` command. Protected settings (safety, benchmark, trace, scoring)
 cannot be overridden from the UI. Binds to 127.0.0.1 by default; with --token every API call needs it.
 
+Research sessions and code-agent runs (research.py) are read from their own files: the runs directory and any
+`--sessions [LABEL=]DIR`.
+
 It is also the control plane for workcells and policy servers (control.py): `--workcell name=url`,
 `--policy name=url`, and per-role tokens (`--role-token viewer=... operator=... approver=...`).
 """
@@ -31,6 +34,8 @@ from .control import ControlPlane, Endpoint, Roles
 from .jobs import JobManager, run_cli
 from .render import jpeg
 from .live import LiveManager, load_config, task_options
+from .world import WorldManager
+from .research import Sessions
 
 STATIC = Path(__file__).parent / "static"
 DEFAULT_JUDGE = "artifact:l10-trace-v2@54a1efadf00d34d8"      # LIBERO-10 trace judge, calibrated (RFC-0004)
@@ -41,12 +46,13 @@ APPROVER_PATHS = ("/api/campaign/approve", "/api/campaign/rollback")
 
 def create_app(root: str | Path = "runs", *, repo: str | Path = ".", token: str | None = None,
                judge: str | None = None, workcells: list[Endpoint] | None = None, policies: list[Endpoint] | None = None,
-               role_tokens: dict[str, str] | None = None) -> FastAPI:
+               role_tokens: dict[str, str] | None = None, sessions: list[str | Path] | None = None) -> FastAPI:
     repo = Path(repo).resolve()
     root = (repo / root).resolve() if not Path(root).is_absolute() else Path(root)
     app = FastAPI(title="Hylo playground", docs_url="/api/docs", openapi_url="/api/openapi.json")
     index, traces = Catalog(root), TraceCache()
     live, jobs = LiveManager(root), JobManager(root, repo)
+    research = Sessions([("", root), *(_session_root(s, repo) for s in sessions or [])], campaign_root=root)
     def artifact_path(ref: str) -> str | None:
         try:
             return str(Store(root).path(ref))
@@ -58,6 +64,54 @@ def create_app(root: str | Path = "runs", *, repo: str | Path = ".", token: str 
 
     roles = Roles(role_tokens, token)
     control = ControlPlane(workcells or [], policies or [])
+    world = WorldManager(root)
+
+    @app.get("/api/world/stages")
+    def world_stages() -> list[dict[str, Any]]:
+        return world.list()
+
+    @app.post("/api/world/stages")
+    def world_create(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        try:
+            return world.create(str(body["name"]))
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(400, str(exc)) from exc
+
+    @app.get("/api/world/{stage}")
+    def world_overview(stage: str) -> dict[str, Any]:
+        try:
+            return world.overview(stage)
+        except KeyError as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.post("/api/world/{stage}/call")
+    def world_call(stage: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        try:
+            return world.call(stage, str(body["tool"]), dict(body.get("arguments") or {}))
+        except KeyError as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.get("/api/world/{stage}/view")
+    def world_view(stage: str, azimuth: float | None = None, elevation: float | None = None,
+                   distance: float | None = None, lx: float = 0.0, ly: float = 0.0, lz: float = 0.5) -> Response:
+        try:
+            png = world.view(stage, azimuth=azimuth, elevation=elevation, distance=distance, lookat=[lx, ly, lz])
+        except (KeyError, ValueError) as exc:
+            raise HTTPException(400, str(exc)) from exc
+        return Response(png, media_type="image/png", headers={"cache-control": "no-store"})
+
+    @app.post("/api/world/{stage}/chat")
+    def world_chat(stage: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        return world.chat(stage, str(body["message"]), str(body.get("model") or "ollama:qwen3.5:35b-a3b"),
+                          bool(body.get("vision", True)))
+
+    @app.post("/api/world/{stage}/stop")
+    def world_stop(stage: str) -> dict[str, Any]:
+        return world.stop(stage)
+
+    @app.get("/api/world/{stage}/transcript")
+    def world_transcript(stage: str, after: int = 0) -> dict[str, Any]:
+        return world.transcript(stage, after)
 
     @app.middleware("http")
     async def auth(request: Request, call_next):
@@ -174,6 +228,26 @@ def create_app(root: str | Path = "runs", *, repo: str | Path = ".", token: str 
         out = run_cli(["evolve", "rollback", str(_campaign_dir(id)), "--reason", body["reason"]], cwd=repo)
         active = out.rsplit(" ", 1)[-1]
         return {"active": None if active == "None" else active}
+
+    # ------------------------------------------------------------ research sessions and code-agent runs
+    @app.get("/api/research/sessions")
+    def research_sessions() -> list[dict[str, Any]]:
+        return research.list()
+
+    @app.get("/api/research/session")
+    def research_session(id: str) -> dict[str, Any]:
+        try:
+            return research.session(id)
+        except KeyError as exc:
+            raise nf(exc)
+
+    @app.get("/api/research/file")
+    def research_file(id: str, path: str) -> Response:
+        try:
+            f, media = research.file(id, path)
+        except KeyError as exc:
+            raise nf(exc)
+        return FileResponse(f, media_type=media, headers={"Cache-Control": "max-age=60"})
 
     # ------------------------------------------------------------ experience and artifacts
     @app.get("/api/artifacts")
@@ -355,6 +429,17 @@ def create_app(root: str | Path = "runs", *, repo: str | Path = ".", token: str 
     return app
 
 
+def _session_root(spec: str | Path, repo: Path) -> tuple[str, Path]:
+    """`[LABEL=]DIR` (relative to the repo) -> (label, directory); the label defaults to the directory name."""
+    spec = str(spec)
+    label, _, path = spec.partition("=") if "=" in spec else ("", "", spec)
+    d = Path(path) if Path(path).is_absolute() else repo / path
+    label = label or d.resolve().name
+    if not label or ":" in label or "/" in label:
+        raise ValueError(f"bad session root label {label!r}")
+    return label, d.resolve()
+
+
 def main(argv: list[str] | None = None) -> int:
     """run the playground: run explorer, live sandbox, campaigns and the workcell control plane"""
     import argparse
@@ -370,6 +455,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--judge", help="success-judge artifact used for progress curves")
     ap.add_argument("--workcell", action="append", default=[], metavar="NAME=URL[#TOKEN]", help="a workcell service")
     ap.add_argument("--policy", action="append", default=[], metavar="NAME=WS_URL[#TOKEN]", help="a policy server endpoint")
+    ap.add_argument("--sessions", action="append", default=[], metavar="[LABEL=]DIR",
+                    help="another directory with research sessions or code-agent runs (the runs directory is always read)")
     ap.add_argument("--role-token", action="append", default=[], metavar="ROLE=TOKEN",
                     help="viewer / operator / approver tokens (none given: the local user has every role)")
     a = ap.parse_args(argv)
@@ -378,7 +465,7 @@ def main(argv: list[str] | None = None) -> int:
     if bad:
         ap.error(f"unknown roles {sorted(bad)}")
     app = create_app(a.root, repo=a.repo, token=a.token, judge=a.judge, workcells=[Endpoint.parse(w) for w in a.workcell],
-                     policies=[Endpoint.parse(p) for p in a.policy], role_tokens=role_tokens)
+                     policies=[Endpoint.parse(p) for p in a.policy], role_tokens=role_tokens, sessions=a.sessions)
     print(f"Hylo playground on http://{a.host}:{a.port}")
     uvicorn.run(app, host=a.host, port=a.port, log_level="warning")
     app.state.live.close()

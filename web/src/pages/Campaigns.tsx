@@ -81,6 +81,8 @@ export function CampaignDetail() {
   const [confirm, setConfirm] = useState<"approve" | "rollback" | null>(null);
   const [reason, setReason] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
+  const [sessions] = useApi<any[]>(c?.archive?.some((e: any) => e.candidate?.evidence?.session) ? "/api/research/sessions" : null, [c]);
+  const sessionOf = (e: any) => sessions?.find((x) => x.dir === e.candidate?.evidence?.session)?.id as string | undefined;
   if (err) return <Err e={err} />;
   if (!c) return <Loading what="campaign" />;
   const st = c.state || {};
@@ -130,6 +132,7 @@ export function CampaignDetail() {
                   <div className="row" style={{ alignItems: "baseline" }}>
                     <span className="mono" style={{ fontSize: 12.5 }}>{e.candidate.id}</span>
                     <span className="faint mono" style={{ fontSize: 11.5 }}>{e.candidate.generator}</span>
+                    {sessionOf(e) && <Link className="toggle" style={{ color: "var(--signal)" }} to={`/research/${encodeURIComponent(sessionOf(e)!)}`}>research session →</Link>}
                     <span className="grow" />
                     <button className="toggle" onClick={() => setOpen(open === e.candidate.id ? null : e.candidate.id)}>{open === e.candidate.id ? "▾ hide patch and evidence" : "▸ patch and evidence"}</button>
                   </div>

@@ -9,6 +9,9 @@ export const Icon = {
   compare: () => <svg viewBox="0 0 24 24" {...P}><path d="M12 3v18" /><rect x="3" y="7" width="6" height="10" rx="1" /><rect x="15" y="5" width="6" height="14" rx="1" /></svg>,
   loop: () => <svg viewBox="0 0 24 24" {...P}><path d="M20 8a8 8 0 0 0-14.5-2M4 16a8 8 0 0 0 14.5 2" /><path d="M5.5 2.5v3.5H9M18.5 21.5V18H15" /></svg>,
   learn: () => <svg viewBox="0 0 24 24" {...P}><path d="M12 3 3 8l9 5 9-5-9-5Z" /><path d="m3 12 9 5 9-5M3 16l9 5 9-5" /></svg>,
+  // a flask with a code bracket inside: programs developed by experiment
+  research: () => <svg viewBox="0 0 24 24" {...P}><path d="M9 3h6M10 3v5.5L4.8 18a2 2 0 0 0 1.8 3h10.8a2 2 0 0 0 1.8-3L14 8.5V3" /><path d="m10.5 13-1.5 1.75 1.5 1.75M13.5 13l1.5 1.75-1.5 1.75" /></svg>,
+  world: () => <svg viewBox="0 0 24 24" {...P}><path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Z" /><path d="m4 7.5 8 4.5 8-4.5M12 12v9" /></svg>,
   jobs: () => <svg viewBox="0 0 24 24" {...P}><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="m7 10 3 2-3 2M12 15h5" /></svg>,
   play: () => <svg viewBox="0 0 24 24" {...P}><path d="M7 5v14l11-7L7 5Z" fill="currentColor" /></svg>,
   pause: () => <svg viewBox="0 0 24 24" {...P}><path d="M8 5v14M16 5v14" strokeWidth={2.6} /></svg>,

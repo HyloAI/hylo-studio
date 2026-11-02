@@ -50,7 +50,7 @@ class JobManager:
         cmd = [sys.executable, "-m", "hylo.core.cli", *KINDS[kind](args)]
         log = open(self.dir / f"{jid}.log", "w")
         proc = subprocess.Popen(cmd, cwd=self.cwd, stdout=log, stderr=subprocess.STDOUT)
-        meta = {"id": jid, "kind": kind, "args": args, "cmd": cmd[2:], "started": time.time(), "pid": proc.pid}
+        meta = {"id": jid, "kind": kind, "args": args, "cmd": cmd[3:], "started": time.time(), "pid": proc.pid}
         (self.dir / f"{jid}.json").write_text(json.dumps(meta, indent=2))
         with self._lock:
             self._procs[jid] = proc

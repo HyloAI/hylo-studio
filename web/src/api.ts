@@ -25,6 +25,11 @@ export function frameUrl(runId: string, episodeId: string, obs: number, cam: str
   return withToken(`/api/runs/${encodeURIComponent(runId)}/episodes/${encodeURIComponent(episodeId)}/frame?obs=${obs}&cam=${cam}`);
 }
 
+/** A file inside a research session or code-agent run directory (images, videos, program sources). */
+export function sessionFileUrl(id: string, path: string): string {
+  return withToken(`/api/research/file?id=${encodeURIComponent(id)}&path=${encodeURIComponent(path)}`);
+}
+
 export function liveSocket(): WebSocket {
   const proto = window.location.protocol === "https:" ? "wss" : "ws";
   return new WebSocket(withToken(`${proto}://${window.location.host}/api/live`));
@@ -57,3 +62,6 @@ export const ago = (ts: number | string) => {
   if (s < 86400 * 1.5) return `${Math.round(s / 3600)} h ago`;
   return `${Math.round(s / 86400)} d ago`;
 };
+export const kTok = (n: number | null | undefined) => (n === null || n === undefined ? "–" : n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e4 ? `${Math.round(n / 1e3)}k` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : String(Math.round(n)));
+export const dur = (s: number | null | undefined) => (s === null || s === undefined ? "–" : s < 60 ? `${s.toFixed(s < 10 ? 1 : 0)} s` : s < 3600 ? `${Math.floor(s / 60)} min ${Math.round(s % 60)} s` : `${Math.floor(s / 3600)} h ${Math.round((s % 3600) / 60)} min`);
+export const usd = (v: number | null | undefined) => (v === null || v === undefined ? "–" : v === 0 ? "$0" : v < 0.01 ? `$${v.toFixed(4)}` : `$${v.toFixed(2)}`);

@@ -23,8 +23,12 @@
 Part of [Hylo](https://hyloai.github.io/), the stack for physical AI. This repository is **Hylo Studio**, the
 **workbench** layer.
 
-The playground: one web UI over runs, campaigns, learning artifacts and workcells. `packages/hylo-playground` is the
+The playground: one web UI over research sessions, runs, campaigns, learning artifacts and workcells. `packages/hylo-playground` is the
 FastAPI backend and control plane (`hylo playground`); `web/` is the React front end, built into the package.
+
+These views support the [robot-skill lifecycle](https://hyloai.github.io/hylo-docs/user-guide/skills/): inspect
+development sessions, execution and validation records, candidate versions, program skills and workcell runs.
+They expose the records available today; a universal skill dashboard is not implemented.
 
 <p align="center">
   <img src=".github/assets/studio-episode.png" width="100%" alt="Studio replaying a LIBERO-10 episode: agent view and wrist camera, translation, rotation and gripper traces, the episode's agent, policy, steering and critic, and the event log">
@@ -61,6 +65,31 @@ uv run hylo playground --repo ../bench \
 
 `--repo` is the working directory the UI shows (`examples/configs`, `examples/evolve`, `runs/`) and runs jobs in.
 Pages and options: [web/README.md](web/README.md).
+
+## Inspect skill development and validation
+
+The Research page reads recorded development sessions: model turns, code, output, camera views, submitted programs,
+development outcomes, frozen source, usage and cost. It links a session to campaign candidates when their evidence
+names it. Scene, replay and motion records can be inspected too. Research is a record viewer; sessions start from
+the CLI, not an interactive editor in this page.
+
+```bash
+uv run hylo playground --repo .. --sessions research=runs/research
+```
+
+`--sessions [LABEL=]DIR` adds session roots relative to `--repo`. See the
+[research guide](https://hyloai.github.io/hylo-docs/user-guide/research-and-skills/) and
+[recorded Research screenshots](examples/README.md#research-pages).
+
+![Research session with development results, usage and model turns](examples/assets/research-session.png)
+
+## Build and run worlds
+
+The World page lists stages, builds a stage into a MuJoCo world, shows a view you can orbit, runs actions and goal
+checks by hand, and runs `hylo world chat` sessions with a model (follow-up messages go to the running session) with
+their transcript and the view after each action. See [Worlds](https://hyloai.github.io/hylo-docs/user-guide/worlds/).
+
+![World page: entities, a free view, actions by hand and a chat session's transcript](examples/assets/world.png)
 
 Documentation (hylo-docs, `uv run mkdocs serve -f docs/mkdocs.yml` from the workspace): [studio](../docs/docs/user-guide/studio.md).
 

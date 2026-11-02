@@ -10,8 +10,10 @@ this directory is the React frontend.
 | Runs | every recorded run; per-task success; episode replay with camera frames, executed actions, chunk boundaries, safety interventions and the success judge's estimate |
 | Compare | two runs paired on (task, seed): wins / losses, exact one-sided McNemar p, per-task deltas, side-by-side replays of discordant pairs |
 | Self-improvement | campaigns, cycles, candidates with hypotheses, search_val and group-sequential gate statistics, vetoes, ledger; approve a pending candidate or roll back |
+| Research | research sessions and code-agent runs (scene builder, motion studio, replay): every turn's text, code, output and images; submissions with per-case outcomes; the frozen program's source and digest; tokens, latency and cost per turn; the campaign candidate the program became. `--sessions [LABEL=]DIR` adds directories besides the runs directory |
 | Experience & learning | skills, lessons, action memories, sealed artifacts with provenance and calibration |
 | Jobs | start `hylo run`, `hylo evolve run`, `hylo calibrate` in the background and follow their logs |
+| World | stages and the MuJoCo worlds built from them: entities, a free view to orbit, actions and goal checks by hand, chat sessions with a model (`hylo world chat`) with their transcript and the view after each action |
 | Operator station | run episodes on a workcell (real robot or simulator) with a chosen policy server; confirm resets, judge outcomes (success / partial / failure), stop; the e-stop is always available |
 
 ## Run
