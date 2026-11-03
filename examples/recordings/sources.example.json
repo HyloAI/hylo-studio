@@ -1,0 +1,42 @@
+{
+  "_comment": "Recorded runs each recording shows. Paths are read only. Replace <workspace> with the development workspace and <archive> with a store that holds the older campaigns and lesson books.",
+  "campaigns": {
+    "campaigns": [
+      {"name": "planar-reach-noise", "src": "<workspace>/harness/runs/examples/memory/skill_library/campaign"},
+      {"name": "libero10-llm", "src": "<archive>/bench/runs/evolve/libero10-llm"}
+    ]
+  },
+  "experience": {
+    "skills": [
+      {"name": "flow-reach", "src": "<archive>/bench/runs/maturity-20261101/skills/flow-reach"},
+      {"name": "manip", "src": "<workspace>/runs/skills/manip"},
+      {"name": "planar-reach", "src": "<workspace>/harness/runs/examples/memory/skill_library/skills"}
+    ],
+    "lessons": [
+      {"name": "flow-reach", "src": "<archive>/bench/runs/maturity-20261101/lessons/flow-reach"},
+      {"name": "libero10", "src": "<archive>/bench/runs/lessons/libero10"}
+    ],
+    "banks": [
+      {"name": "reach-sessions", "src": "<workspace>/harness/runs/examples/memory/memory_across_sessions/bank-v6"}
+    ],
+    "campaigns": [
+      {"name": "stack-program", "src": "<workspace>/runs/campaign/campaign"}
+    ],
+    "sessions": "<workspace>/runs/campaign/research"
+  },
+  "world": {
+    "stages": [
+      {"name": "arms", "src": "<workspace>/runs/world-showcase/stages/arms"},
+      {"name": "demo1", "src": "<workspace>/runs/world-chat/stages/demo1"}
+    ],
+    "sessions": [
+      {"stage": "demo1", "src": "<workspace>/runs/world-chat/demo1"}
+    ],
+    "live_config": "<workspace>/runs/tools-llm/configs/tools-llm-qwen-stack.yaml"
+  },
+  "terminal": {
+    "run": "<workspace>/runs/tools-llm/tools-llm-qwen-stack-validation-3f082eac39a59efc-af39d8",
+    "command": "uv run hylo watch runs/tools-llm/tools-llm-qwen-stack --replay --speed 8",
+    "speed": 8
+  }
+}
