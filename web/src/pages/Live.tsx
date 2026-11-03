@@ -46,8 +46,10 @@ export function Live() {
   const logEnd = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    let current = true;                               // a slower answer for an earlier config must not overwrite this one
     setOpts(null); setOptErr(null);
     post("/api/live/options", { config }).then((o) => {
+      if (!current) return;
       setOpts(o);
       const sp = o.splits[o.default_split] ? o.default_split : Object.keys(o.splits)[0];
       setSplit(sp);
@@ -56,7 +58,8 @@ export function Live() {
       const p = steeringPath(o.agent);
       const st = p ? dig(o, p) || {} : {};
       setSamples(st.n_samples ?? 1); setReplan(st.execution_steps ?? 50); setNoise(st.noise_scale ?? 1.0);
-    }).catch((e) => setOptErr(String(e.message || e)));
+    }).catch((e) => { if (current) setOptErr(String(e.message || e)); });
+    return () => { current = false; };
   }, [config]);
   useEffect(() => { logEnd.current?.scrollIntoView({ block: "nearest" }); }, [log.length]);
 
