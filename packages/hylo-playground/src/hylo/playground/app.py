@@ -93,9 +93,11 @@ def create_app(root: str | Path = "runs", *, repo: str | Path = ".", token: str 
 
     @app.get("/api/world/{stage}/view")
     def world_view(stage: str, azimuth: float | None = None, elevation: float | None = None,
-                   distance: float | None = None, lx: float = 0.0, ly: float = 0.0, lz: float = 0.5) -> Response:
+                   distance: float | None = None, lx: float = 0.0, ly: float = 0.0, lz: float = 0.5,
+                   width: int = Query(640, ge=64, le=1280), height: int = Query(480, ge=64, le=960)) -> Response:
         try:
-            png = world.view(stage, azimuth=azimuth, elevation=elevation, distance=distance, lookat=[lx, ly, lz])
+            png = world.view(stage, azimuth=azimuth, elevation=elevation, distance=distance, lookat=[lx, ly, lz],
+                             width=width, height=height)
         except (KeyError, ValueError) as exc:
             raise HTTPException(400, str(exc)) from exc
         return Response(png, media_type="image/png", headers={"cache-control": "no-store"})
@@ -103,7 +105,7 @@ def create_app(root: str | Path = "runs", *, repo: str | Path = ".", token: str 
     @app.post("/api/world/{stage}/chat")
     def world_chat(stage: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
         return world.chat(stage, str(body["message"]), str(body.get("model") or "ollama:qwen3.5:35b-a3b"),
-                          bool(body.get("vision", True)))
+                          bool(body.get("vision", True)), bool(body.get("text_tools", False)))
 
     @app.post("/api/world/{stage}/stop")
     def world_stop(stage: str) -> dict[str, Any]:

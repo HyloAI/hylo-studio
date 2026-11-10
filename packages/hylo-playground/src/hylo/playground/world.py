@@ -87,7 +87,12 @@ class WorldManager:
     def view(self, stage: str, **cam: Any) -> bytes:
         with self._lock(stage):
             s = self.surface(stage)
-            if not s.call("world_state", {}).ok:
+            state = s.call("world_state", {})
+            # Chat runs in another process. Recompile this viewer only once the
+            # model has built the latest revision; unbuilt edits stay staged.
+            stale_chat = (state.ok and state.result.get("revision") != state.result.get("stage_revision_now")
+                          and self._chat_built_revision(stage) == state.result.get("stage_revision_now"))
+            if not state.ok or stale_chat:
                 b = s.call("world_build", {})
                 if not b.ok:
                     raise ValueError(b.error.get("message") if b.error else "the world does not build")
@@ -96,12 +101,27 @@ class WorldManager:
             raise ValueError(r.error.get("message"))
         return _png(r.images[0])
 
+    def _chat_built_revision(self, stage: str) -> int | None:
+        folder = self.sessions / stage / "episodes"
+        for path in sorted(folder.glob("*.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True):
+            for line in reversed(path.read_text(encoding="utf-8").splitlines()):
+                try:
+                    event = json.loads(line)
+                    payload = event.get("payload") or {}
+                    if (event.get("type") == "agent.tool.result" and payload.get("name") == "world_build"
+                            and payload.get("ok")):
+                        return json.loads(payload["result"]).get("revision")
+                except (ValueError, KeyError, TypeError):
+                    continue  # a running session may still be writing its last line
+        return None
+
     # ------------------------------------------------------------------ chat sessions
     def _running(self, stage: str) -> bool:
         p = self._procs.get(stage)
         return bool(p and p.poll() is None)
 
-    def chat(self, stage: str, message: str, model: str = "ollama:qwen3.5:35b-a3b", vision: bool = True) -> dict[str, Any]:
+    def chat(self, stage: str, message: str, model: str = "ollama:qwen3.5:35b-a3b", vision: bool = True,
+             text_tools: bool = False) -> dict[str, Any]:
         out = self.sessions / stage
         inbox = out / "inbox.jsonl"
         if self._running(stage):
@@ -114,6 +134,8 @@ class WorldManager:
                str(self.stages), "--out", str(out), "--model", model, "--inbox", str(inbox)]
         if vision:
             cmd.append("--vision")
+        if text_tools:
+            cmd.append("--text-tools")
         log = open(out / "session.log", "a")
         self._procs[stage] = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, env=dict(os.environ))
         self._surfaces.pop(stage, None)            # the session changes the stage: rebuild ours on next use
@@ -134,6 +156,8 @@ class WorldManager:
         for f in files:
             with open(f, encoding="utf-8") as fh:
                 for line in fh:
+                    if not line.endswith("\n"):
+                        break  # do not advance past a live writer's incomplete event
                     n += 1
                     if n <= after or '"agent.tool.' not in line[:40]:
                         continue

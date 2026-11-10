@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import { BrowserRouter, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import "@fontsource-variable/archivo/wdth.css";
 import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/500.css";
@@ -40,7 +40,7 @@ function Rail() {
     <nav className="rail">
       <div className="brand"><Icon.mark /><div><b>Hylo</b><small>workcell console</small></div></div>
       <div className="nav">
-        {NAV.map(([to, label, I]) => <NavLink key={to} to={to} end={to === "/"}><I />{label}</NavLink>)}
+        {NAV.map(([to, label, I]) => <NavLink key={to} to={to} end={to === "/"} title={label} aria-label={label}><I /><span className="nav-label">{label}</span></NavLink>)}
       </div>
       <div className="status">
         <div className="label">system</div>
@@ -55,8 +55,9 @@ function Rail() {
 }
 
 function App() {
+  const world = useLocation().pathname.startsWith("/world/");
   return (
-    <div className="shell">
+    <div className={`shell${world ? " world-shell" : ""}`}>
       <Rail />
       <main className="page">
         <Routes>

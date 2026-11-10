@@ -85,11 +85,17 @@ uv run hylo playground --repo .. --sessions research=runs/research
 
 ## Build and run worlds
 
-The World page lists stages, builds a stage into a MuJoCo world, shows a view you can orbit, runs actions and goal
-checks by hand, and runs `hylo world chat` sessions with a model (follow-up messages go to the running session) with
-their transcript and the view after each action. See [Worlds](https://hyloai.github.io/hylo-docs/user-guide/worlds/).
+World Studio pairs a large MuJoCo scene view with **Chat**, **Scene** and **Controls** panels. Build and refine
+stages through `hylo world chat`, inspect objects and their positions, or run actions and goal checks by hand.
+Orbit, zoom, switch camera presets, focus an object and save a snapshot. Follow-up chat messages go to the running
+session; the transcript groups tool activity and keeps errors visible.
 
-![World page: entities, a free view, actions by hand and a chat session's transcript](examples/assets/world.png)
+[![World Studio: a dual-arm workbench built through chat, with scene inspection and camera controls](examples/assets/world.png)](https://hyloai.github.io/hylo-docs/user-guide/worlds/#chat-to-world-demo)
+
+[**Watch the full English demo · 2:10**](https://hyloai.github.io/hylo-docs/user-guide/worlds/#chat-to-world-demo) —
+recorded AI session replay with waits shortened: an empty world, three build and refinement sessions, then a
+23-object scene with two Panda arms and a tour of the scene controls. This demonstrates scene construction and
+inspection. See [Worlds](https://hyloai.github.io/hylo-docs/user-guide/worlds/) for the tools and separate robot-motion examples.
 
 Documentation (hylo-docs, `uv run mkdocs serve -f docs/mkdocs.yml` from the workspace): [studio](../docs/docs/user-guide/studio.md).
 
